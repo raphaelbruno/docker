@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  webserver:
+    build:
+      context: ./.docker/bin/webserver
+    restart: 'always'
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    volumes:
+      - ${DOCUMENT_ROOT-./}:/var/www/html
+      - ${PHP_INI-./.docker/config/php/php.ini}:/usr/local/etc/php/php.ini
+      - ${VHOSTS_DIR-./.docker/config/vhosts}:/etc/apache2/sites-enabled
+      - ${LOG_DIR-./.docker/logs/apache2}:/var/log/apache2
+  db:
+    image: mysql:5.6
+    restart: always
+    environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_USER=root
+    ports:
+        - 3306:3306
+    volumes:
+        - ./.docker/conf/mysql/:/data/
